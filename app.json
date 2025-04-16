@@ -4,13 +4,13 @@
     "slug": "Medrano_Elline_Mobile_Opdracht3",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/app-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/app-icon.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#ebe6de"
     },
     "ios": {
       "supportsTablet": true
@@ -23,6 +23,16 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+     [ "expo-font",
+        {
+          "fonts": 
+          [
+            "./assets/fonts/Montserrat-VariableFont_wght.ttf"
+          ]
+        }
+      ]
+    ]
   }
 }

@@ -10,6 +10,7 @@ const Header = ({ title, canGoBack, navigation }: any) => (
         <Ionicons name="arrow-back" size={24} color="#fff" />
       </TouchableOpacity>
     )}
+    <Image source={require("../assets/app-icon.png")} style={styles.icon} />
     <Text style={styles.title}>{title}</Text>
   </View>
 );

@@ -1,28 +1,10 @@
-import React, { useState } from "react";
-import { FlatList, View, StyleSheet } from "react-native";
-import { WISHLIST } from "../data/dummy-data";
+import React from "react";
+import { FlatList, StyleSheet } from "react-native";
 import Card from "../components/Card";
-import { useFocusEffect } from "@react-navigation/native";
+import { useWishlist } from "../context/WishlistContext"; // gebruik de context
 
-const AllItemsScreen = ({ navigation, route }: any) => {
-  const [items, setItems] = useState(WISHLIST);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (route.params?.newItem) {
-        setItems((prevItems) => [...prevItems, route.params.newItem]);
-        route.params.newItem = null;
-      }
-    }, [route.params?.newItem])
-  );
-
-  const toggleBought = (id: string) => {
-    setItems((current) =>
-      current.map((item) =>
-        item.id === id ? { ...item, bought: !item.bought } : item
-      )
-    );
-  };
+const AllItemsScreen = ({ navigation }: any) => {
+  const { items, toggleBought } = useWishlist(); // haal items en toggle functie op
 
   return (
     <FlatList

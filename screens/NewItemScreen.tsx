@@ -13,6 +13,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import { WishlistItem } from "../types/wishlist";
 import uuid from "react-native-uuid";
+import { useWishlist } from "../context/WishlistContext"; // context import
 
 const validationSchema = Yup.object({
   title: Yup.string().min(4, "Minstens 4 tekens").required("Verplicht"),
@@ -21,6 +22,8 @@ const validationSchema = Yup.object({
 });
 
 const NewItemScreen = ({ navigation }: any) => {
+  const { addItem } = useWishlist(); // add functie uit context
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
@@ -35,12 +38,20 @@ const NewItemScreen = ({ navigation }: any) => {
               price: values.price,
               bought: false,
             };
+
+            const success = addItem(newItem);
+
+            if (!success) {
+              Alert.alert("Let op", "Een item met deze titel bestaat al.");
+              return;
+            }
+
             Alert.alert(
               "Item toegevoegd!",
               `${newItem.title} van ${newItem.brand}`
             );
             actions.resetForm();
-            navigation.navigate("AllItems", { newItem }); // ← Send new item back
+            navigation.goBack();
           }}
         >
           {(props) => (
