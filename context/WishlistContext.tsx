@@ -4,7 +4,7 @@ import { WISHLIST } from "../data/dummy-data";
 
 type WishlistContextType = {
   items: WishlistItem[];
-  addItem: (item: WishlistItem) => boolean; // returns false if title exists
+  addItem: (item: WishlistItem) => boolean;
   toggleBought: (id: string) => void;
 };
 

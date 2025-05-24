@@ -1,10 +1,11 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { RootStackParamList } from "./types";
 import TabNavigator from "./TabNavigator";
 import ItemDetailScreen from "../screens/ItemDetailScreen";
 import Header from "../components/Header";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const StackNavigator = () => (
   <Stack.Navigator

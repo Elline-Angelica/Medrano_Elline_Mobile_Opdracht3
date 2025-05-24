@@ -6,7 +6,11 @@ import * as SplashScreen from "expo-splash-screen";
 import { Text } from "react-native";
 
 import StackNavigator from "./navigation/StackNavigator";
-import { WishlistProvider } from "./context/WishlistContext";
+
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import { store, persistor } from "./store/store";
+import "react-native-get-random-values";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,11 +35,13 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <WishlistProvider>
-        <NavigationContainer theme={navTheme}>
-          <StackNavigator />
-        </NavigationContainer>
-      </WishlistProvider>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <NavigationContainer theme={navTheme}>
+            <StackNavigator />
+          </NavigationContainer>
+        </PersistGate>
+      </Provider>
     </GestureHandlerRootView>
   );
 }

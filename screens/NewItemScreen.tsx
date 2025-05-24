@@ -1,118 +1,115 @@
-import React from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Alert,
-} from "react-native";
-import { Formik } from "formik";
-import * as Yup from "yup";
-import { WishlistItem } from "../types/wishlist";
-import uuid from "react-native-uuid";
-import { useWishlist } from "../context/WishlistContext"; // context import
+import React, { useState } from "react";
+import { View, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { addItem } from "../store/wishlistSlice";
+import { useNavigation } from "@react-navigation/native";
+import { v4 as uuidv4 } from "uuid";
+import { RootState } from "../store/store";
+import { addWishlistItem } from "../firebaseService";
+import Header from "../components/Header";
 
-const validationSchema = Yup.object({
-  title: Yup.string().min(4, "Minstens 4 tekens").required("Verplicht"),
-  brand: Yup.string().min(4, "Minstens 4 tekens").required("Verplicht"),
-  price: Yup.string().required("Verplicht"),
-});
+const NewItemScreen = () => {
+  const [title, setTitle] = useState("");
+  const [brand, setBrand] = useState("");
+  const [price, setPrice] = useState("");
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const items = useSelector((state: RootState) => state.wishlist.items);
 
-const NewItemScreen = ({ navigation }: any) => {
-  const { addItem } = useWishlist(); // add functie uit context
+  const handleAdd = async () => {
+    const trimmedTitle = title.trim();
+    const trimmedBrand = brand.trim();
+    const trimmedPrice = price.trim();
+
+    if (!trimmedTitle || !trimmedBrand || !trimmedPrice) {
+      Alert.alert("Please fill in all the fields");
+      return;
+    }
+
+    if (trimmedTitle.length < 4) {
+      Alert.alert(
+        "Name is too short",
+        "The title must at least have 4 characters."
+      );
+      return;
+    }
+
+    const duplicate = items.find(
+      (item) => item.title.trim().toLowerCase() === trimmedTitle.toLowerCase()
+    );
+
+    if (duplicate) {
+      Alert.alert(
+        "Item already exists",
+        "An item with this name already exists."
+      );
+      return;
+    }
+
+    try {
+      await addWishlistItem({
+        title: trimmedTitle,
+        brand: trimmedBrand,
+        price: trimmedPrice,
+        bought: false,
+      });
+      console.log("Item added:", {
+        title: trimmedTitle,
+        brand: trimmedBrand,
+        price: trimmedPrice,
+        bought: false,
+      });
+
+      Alert.alert("Success", "Item has been added to your wishlist!");
+
+      setTitle("");
+      setBrand("");
+      setPrice("");
+
+      setTimeout(() => {
+        navigation.goBack();
+      }, 500);
+    } catch (error) {
+      console.error("Error adding item:", error);
+      Alert.alert("Error", "Failed to add item. Try again.");
+    }
+  };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
-        <Formik
-          initialValues={{ title: "", brand: "", price: "" }}
-          validationSchema={validationSchema}
-          onSubmit={(values, actions) => {
-            const newItem: WishlistItem = {
-              id: uuid.v4().toString(),
-              title: values.title,
-              brand: values.brand,
-              price: values.price,
-              bought: false,
-            };
-
-            const success = addItem(newItem);
-
-            if (!success) {
-              Alert.alert("Let op", "Een item met deze titel bestaat al.");
-              return;
-            }
-
-            Alert.alert(
-              "Item toegevoegd!",
-              `${newItem.title} van ${newItem.brand}`
-            );
-            actions.resetForm();
-            navigation.goBack();
-          }}
-        >
-          {(props) => (
-            <View>
-              <TextInput
-                placeholder="Item naam"
-                style={styles.input}
-                onChangeText={props.handleChange("title")}
-                onBlur={props.handleBlur("title")}
-                value={props.values.title}
-              />
-              <Text style={styles.error}>
-                {props.touched.title && props.errors.title}
-              </Text>
-
-              <TextInput
-                placeholder="Merk"
-                style={styles.input}
-                onChangeText={props.handleChange("brand")}
-                onBlur={props.handleBlur("brand")}
-                value={props.values.brand}
-              />
-              <Text style={styles.error}>
-                {props.touched.brand && props.errors.brand}
-              </Text>
-
-              <TextInput
-                placeholder="Prijs"
-                style={styles.input}
-                onChangeText={props.handleChange("price")}
-                onBlur={props.handleBlur("price")}
-                value={props.values.price}
-              />
-              <Text style={styles.error}>
-                {props.touched.price && props.errors.price}
-              </Text>
-
-              <Button title="Toevoegen" onPress={props.handleSubmit as any} />
-              <Button
-                title="Annuleren"
-                color="grey"
-                onPress={() => navigation.goBack()}
-              />
-            </View>
-          )}
-        </Formik>
-      </View>
-    </TouchableWithoutFeedback>
+    <View style={styles.container}>
+      <TextInput
+        placeholder="Title"
+        value={title}
+        onChangeText={setTitle}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Brand"
+        value={brand}
+        onChangeText={setBrand}
+        style={styles.input}
+      />
+      <TextInput
+        placeholder="Price in €"
+        value={price}
+        onChangeText={setPrice}
+        keyboardType="numeric"
+        style={styles.input}
+      />
+      <Button title="Add Item to Wishlist" onPress={handleAdd} />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 6,
+    padding: 12,
+    marginBottom: 15,
+    borderRadius: 8,
   },
-  error: { color: "red", marginBottom: 5 },
 });
 
 export default NewItemScreen;
