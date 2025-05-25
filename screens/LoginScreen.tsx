@@ -10,6 +10,7 @@ import {
 import { signInWithEmailAndPassword, signInAnonymously } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
+import { Image } from "react-native";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -34,6 +35,7 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Image source={require("../assets/app-icon.png")} style={styles.icon} />
       <Text style={styles.title}>Sign In</Text>
 
       <TextInput
@@ -107,6 +109,12 @@ const styles = StyleSheet.create({
     color: "#c7b299",
     fontWeight: "bold",
     textAlign: "center",
+  },
+  icon: {
+    width: 80,
+    height: 80,
+    marginBottom: 20,
+    alignSelf: "center",
   },
 });
 

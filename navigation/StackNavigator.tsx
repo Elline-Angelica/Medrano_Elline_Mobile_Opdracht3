@@ -43,7 +43,7 @@ const StackNavigator = () => {
           <Stack.Screen
             name="HomeTabs"
             component={TabNavigator}
-            options={{ title: "Luxury Wishlist" }}
+            options={{ title: "" }}
           />
           <Stack.Screen
             name="ItemDetail"

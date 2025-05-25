@@ -1,4 +1,3 @@
-// firebaseService.ts
 import { db } from "./firebaseConfig";
 import {
   collection,
@@ -9,11 +8,17 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { WishlistItem } from "./store/types";
+import { auth } from "./firebaseConfig";
 
-const wishlistRef = collection(db, "wishlist");
+const getUserWishlistRef = () => {
+  const userId = auth.currentUser?.uid;
+  if (!userId) throw new Error("No user logged in");
+  return collection(db, "users", userId, "wishlist");
+};
 
 export const fetchWishlistItems = async (): Promise<WishlistItem[]> => {
-  const snapshot = await getDocs(wishlistRef);
+  const ref = getUserWishlistRef();
+  const snapshot = await getDocs(ref);
   return snapshot.docs.map((docSnap) => ({
     ...(docSnap.data() as WishlistItem),
     id: docSnap.id,
@@ -21,13 +26,24 @@ export const fetchWishlistItems = async (): Promise<WishlistItem[]> => {
 };
 
 export const addWishlistItem = async (item: Omit<WishlistItem, "id">) => {
-  await addDoc(wishlistRef, item);
+  const user = auth.currentUser;
+  if (!user || user.isAnonymous) {
+    return;
+  }
+
+  const ref = collection(db, "users", user.uid, "wishlist");
+  await addDoc(ref, item);
 };
 
+
 export const deleteWishlistItem = async (id: string) => {
-  await deleteDoc(doc(db, "wishlist", id));
+  const userId = auth.currentUser?.uid;
+  if (!userId) return;
+  await deleteDoc(doc(db, "users", userId, "wishlist", id));
 };
 
 export const toggleBoughtInFirestore = async (id: string, current: boolean) => {
-  await updateDoc(doc(db, "wishlist", id), { bought: !current });
+  const userId = auth.currentUser?.uid;
+  if (!userId) return;
+  await updateDoc(doc(db, "users", userId, "wishlist", id), { bought: !current });
 };

@@ -1,14 +1,20 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { signOut } from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { clearWishlist } from "../store/wishlistSlice";
 import { auth } from "../firebaseConfig";
 import { useAuthUser } from "../context/AuthUserContext";
 
 const AboutScreen = () => {
   const user = useAuthUser();
+  const dispatch = useDispatch();
 
   const handleLogout = async () => {
     try {
+      if (auth.currentUser?.isAnonymous) {
+        dispatch(clearWishlist());
+      }
       await signOut(auth);
     } catch (error: any) {
       Alert.alert("Logout failed", error.message);
@@ -18,8 +24,8 @@ const AboutScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Luxury Wishlist App</Text>
-      <Text style={styles.subtitle}>Versie 3.0</Text>
-      <Text style={styles.subtitle}>Gemaakt door Elline Medrano</Text>
+      <Text style={styles.subtitle}>Version 3.0</Text>
+      <Text style={styles.subtitle}>Made by Elline Medrano</Text>
 
       <View style={styles.infoBox}>
         <Text style={styles.infoLabel}>👤 Naam:</Text>
@@ -27,7 +33,7 @@ const AboutScreen = () => {
 
         <Text style={styles.infoLabel}>📧 Email:</Text>
         <Text style={styles.infoValue}>
-          {user?.email || (user?.isAnonymous ? "(anoniem)" : "–")}
+          {user?.email || (user?.isAnonymous ? "(anonymous)" : "–")}
         </Text>
       </View>
 

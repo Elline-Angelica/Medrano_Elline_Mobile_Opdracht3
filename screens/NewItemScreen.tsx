@@ -1,12 +1,20 @@
 import React, { useState } from "react";
-import { View, TextInput, Button, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { addItem } from "../store/wishlistSlice";
 import { useNavigation } from "@react-navigation/native";
 import { v4 as uuidv4 } from "uuid";
 import { RootState } from "../store/store";
 import { addWishlistItem } from "../firebaseService";
-import Header from "../components/Header";
+import { auth } from "../firebaseConfig"; // ⬅️ was nog niet geïmporteerd
 
 const NewItemScreen = () => {
   const [title, setTitle] = useState("");
@@ -46,33 +54,35 @@ const NewItemScreen = () => {
       return;
     }
 
+    const newItem = {
+      id: uuidv4(),
+      title: trimmedTitle,
+      brand: trimmedBrand,
+      price: trimmedPrice,
+      bought: false,
+    };
+
+    //lokaal in Redux voor anonieme gebruikers
+    dispatch(addItem(newItem));
+
     try {
-      await addWishlistItem({
-        title: trimmedTitle,
-        brand: trimmedBrand,
-        price: trimmedPrice,
-        bought: false,
-      });
-      console.log("Item added:", {
-        title: trimmedTitle,
-        brand: trimmedBrand,
-        price: trimmedPrice,
-        bought: false,
-      });
-
-      Alert.alert("Success", "Item has been added to your wishlist!");
-
-      setTitle("");
-      setBrand("");
-      setPrice("");
-
-      setTimeout(() => {
-        navigation.goBack();
-      }, 500);
+      await addWishlistItem(newItem);
+      console.log("Item added to Firestore:", newItem);
     } catch (error) {
-      console.error("Error adding item:", error);
-      Alert.alert("Error", "Failed to add item. Try again.");
+      console.error("Error adding item to Firestore:", error);
+      Alert.alert("Error", "Failed to sync item to cloud.");
     }
+
+    Alert.alert("Success", "Item has been added to your wishlist!");
+
+    // Clear form
+    setTitle("");
+    setBrand("");
+    setPrice("");
+
+    setTimeout(() => {
+      navigation.goBack();
+    }, 500);
   };
 
   return (
@@ -96,19 +106,35 @@ const NewItemScreen = () => {
         keyboardType="numeric"
         style={styles.input}
       />
-      <Button title="Add Item to Wishlist" onPress={handleAdd} />
+      <TouchableOpacity style={styles.button} onPress={handleAdd}>
+        <Text style={styles.buttonText}>Add Item to Wishlist</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+  container: { flex: 1, padding: 20, backgroundColor: "#ece4dc" },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     padding: 12,
     marginBottom: 15,
     borderRadius: 8,
+    backgroundColor: "#fff",
+  },
+  button: {
+    backgroundColor: "#ede4db",
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#c7b299",
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: "#c7b299",
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 

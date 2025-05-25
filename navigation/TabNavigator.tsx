@@ -8,12 +8,17 @@ import { Ionicons } from "@expo/vector-icons";
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => (
-  <Tab.Navigator>
+  <Tab.Navigator
+    screenOptions={{
+      tabBarActiveTintColor: "#c6b29b", // <- active icon/text color
+      tabBarInactiveTintColor: "#888", // <- optional: inactive color
+    }}
+  >
     <Tab.Screen
       name="AllItems"
       component={AllItemsScreen}
       options={{
-        title: "All Items",
+        title: "My Luxury Wishlist",
         tabBarIcon: ({ color, size }) => (
           <Ionicons name="list" color={color} size={size} />
         ),

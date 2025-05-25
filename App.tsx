@@ -4,6 +4,7 @@ import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { Text } from "react-native";
+import "react-native-gesture-handler";
 
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";

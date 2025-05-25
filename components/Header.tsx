@@ -21,7 +21,6 @@ const Header = ({ title, canGoBack, navigation }: any) => {
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
       )}
-      <Image source={require("../assets/app-icon.png")} style={styles.icon} />
       <Text style={styles.title}>{title}</Text>
 
       <View style={styles.counter}>
@@ -33,10 +32,9 @@ const Header = ({ title, canGoBack, navigation }: any) => {
 
 const styles = StyleSheet.create({
   header: {
-    height: 120,
+    height: 110,
     justifyContent: "flex-end",
     alignItems: "center",
-    paddingBottom: 10,
   },
   bg: {
     ...StyleSheet.absoluteFillObject,
