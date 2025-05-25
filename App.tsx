@@ -5,12 +5,13 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { Text } from "react-native";
 
-import StackNavigator from "./navigation/StackNavigator";
-
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./store/store";
 import "react-native-get-random-values";
+import StackNavigator from "./navigation/StackNavigator";
+
+import { AuthUserProvider } from "./context/AuthUserContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -37,9 +38,11 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <NavigationContainer theme={navTheme}>
-            <StackNavigator />
-          </NavigationContainer>
+          <AuthUserProvider>
+            <NavigationContainer theme={navTheme}>
+              <StackNavigator />
+            </NavigationContainer>
+          </AuthUserProvider>
         </PersistGate>
       </Provider>
     </GestureHandlerRootView>
